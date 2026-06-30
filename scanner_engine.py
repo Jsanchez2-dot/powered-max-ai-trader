@@ -30,6 +30,14 @@ def calculate_vfi(close, high, low, volume, length=130, coef=0.2, vcoef=2.5):
     return pd.Series(vcp, index=close.index).rolling(length).sum() / vave
 
 
+def safe_rr(entry, stop, target):
+    risk = entry - stop
+    reward = target - entry
+    if risk <= 0:
+        return 0
+    return reward / risk
+
+
 def get_data(ticker):
     df = yf.download(ticker, period=LOOKBACK, interval="1d", auto_adjust=True, progress=False)
     if isinstance(df.columns, pd.MultiIndex):
@@ -71,6 +79,21 @@ def score_stock(ticker):
     fib_618 = move_high - (move_high - move_low) * 0.618
     in_fib_zone = fib_618 <= last_close <= fib_50
 
+    stop = swing_low * 0.985
+    entry_low = fib_618
+    entry_high = fib_50
+    entry_mid = (entry_low + entry_high) / 2
+
+    target_1 = swing_high
+    target_2 = entry_mid + (entry_mid - stop) * 2
+    target_3 = entry_mid + (entry_mid - stop) * 3
+
+    risk_per_share = max(entry_mid - stop, 0)
+    rr_target_1 = safe_rr(entry_mid, stop, target_1)
+    rr_target_2 = safe_rr(entry_mid, stop, target_2)
+    rr_target_3 = safe_rr(entry_mid, stop, target_3)
+    max_rr = max(rr_target_1, rr_target_2, rr_target_3)
+
     score = 0
     score += 20 if bullish_bos else 0
     score += 15 if above_200 else 0
@@ -80,18 +103,14 @@ def score_stock(ticker):
     score += 10 if rvol >= 1.5 else 0
     score += 10 if in_fib_zone else 0
     score += 10 if last_close > swing_low else 0
+    score += 5 if max_rr >= 3 else 0
 
-    if score >= 85:
+    if score >= 85 and max_rr >= 3:
         action = "BUY SETUP"
     elif score >= 70:
         action = "WATCH"
     else:
         action = "WAIT"
-
-    stop = swing_low * 0.985
-    target_1 = swing_high
-    target_2 = last_close + (last_close - stop) * 2
-    target_3 = last_close + (last_close - stop) * 3
 
     result = {
         "ticker": ticker,
@@ -109,11 +128,19 @@ def score_stock(ticker):
         "fib_50": round(fib_50, 2),
         "fib_618": round(fib_618, 2),
         "in_fib_zone": in_fib_zone,
-        "entry_zone": f"{round(fib_618, 2)} - {round(fib_50, 2)}",
+        "entry_low": round(entry_low, 2),
+        "entry_high": round(entry_high, 2),
+        "entry_mid": round(entry_mid, 2),
+        "entry_zone": f"{round(entry_low, 2)} - {round(entry_high, 2)}",
         "stop_loss": round(stop, 2),
+        "risk_per_share": round(risk_per_share, 2),
         "target_1": round(target_1, 2),
         "target_2": round(target_2, 2),
         "target_3": round(target_3, 2),
+        "rr_target_1": round(rr_target_1, 2),
+        "rr_target_2": round(rr_target_2, 2),
+        "rr_target_3": round(rr_target_3, 2),
+        "max_rr": round(max_rr, 2),
     }
     return result, df
 
