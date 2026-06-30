@@ -2,20 +2,27 @@
 
 AI / semiconductor / high-volume stock scanner for Robinhood manual trading.
 
-## What it does
+## Current Features
 
-- Scans AI and semiconductor stocks
-- Filters for high volume and minimum price
-- Scores each ticker using trend, volume, VFI, Fibonacci, and BOS-style rules
-- Shows Buy Setup / Watch / Wait signals
-- Builds a local Streamlit web dashboard
-- Exports scanner results to CSV
+- AI and high-volume stock scanner
+- LuxAlgo-style market-structure review
+- BOS / CHOCH / MSS labels
+- Order block and fair value gap logic
+- Fibonacci entry-zone confluence
+- Risk-to-reward calculator
+- Position sizing by account size and risk percentage
+- Trade journal
+- Performance tracking base
+- News analysis hook
+- Text/webhook alert hook
+- Mobile-friendly dashboard theme
 
-## Quick start
+## Run locally
 
 ```bash
-pip install -r requirements.txt
-streamlit run app.py
+git pull
+pip3 install -r requirements.txt
+python3 -m streamlit run app.py
 ```
 
 Then open:
@@ -24,7 +31,31 @@ Then open:
 http://localhost:8501
 ```
 
-Click **Run Daily Scan**.
+Click **Run Live Scan**.
+
+## Cloud deployment
+
+See:
+
+```text
+docs/DEPLOYMENT.md
+```
+
+## Text alerts
+
+See:
+
+```text
+docs/TEXT_ALERTS.md
+```
+
+## Product plan
+
+See:
+
+```text
+docs/PRODUCT_PLAN.md
+```
 
 ## Robinhood
 
@@ -32,4 +63,4 @@ This app does not place trades automatically. Use the signals to manually place 
 
 ## Important
 
-This is not financial advice. It is a trading scanner and decision-support tool only.
+This is not financial advice. It is a scanner and decision-support tool only.
