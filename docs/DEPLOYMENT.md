@@ -5,7 +5,7 @@
 ```bash
 git pull
 pip3 install -r requirements.txt
-python3 -m streamlit run app.py
+python3 -m streamlit run app_barebones.py
 ```
 
 Open:
@@ -22,7 +22,7 @@ http://localhost:8501
 4. Set main file path to:
 
 ```text
-app.py
+app_barebones.py
 ```
 
 5. Deploy.
